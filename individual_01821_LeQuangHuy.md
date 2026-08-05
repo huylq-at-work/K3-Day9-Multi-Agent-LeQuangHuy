@@ -11,7 +11,7 @@
 | Thông tin       | Nội dung                                      |
 | --------------- | --------------------------------------------- |
 | Họ và tên       | Lê Quang Huy                                  |
-| MSSV            | [MSSV đầy đủ — bạn mới cho 5 số cuối: 01821]  |
+| MSSV            | 2A202601821                                   |
 | Khóa/Lớp        | K3                                            |
 | Vai trò chính   | Làm cá nhân — sở hữu toàn bộ pipeline         |
 | Ngày hoàn thành | 2026-08-05                                    |

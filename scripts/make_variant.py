@@ -56,6 +56,34 @@ def v_evidence_no_item(o: dict[str, Any]) -> dict[str, Any]:
     return o
 
 
+def v_evidence_no_seller(o: dict[str, Any]) -> dict[str, Any]:
+    """Bỏ evidence seller: NHƯNG giữ nguyên seller_ids trong affected_entities.
+
+    Thí nghiệm bỏ seller trước đây sửa cả hai chỗ nên không tách được nguyên nhân.
+    Biến thể này chỉ đụng evidence.
+    """
+    o["evidence_ids"] = [e for e in o["evidence_ids"] if not e.startswith("seller:")]
+    return o
+
+
+def v_evidence_no_payment(o: dict[str, Any]) -> dict[str, Any]:
+    o["evidence_ids"] = [e for e in o["evidence_ids"] if not e.startswith("payment:")]
+    return o
+
+
+def v_evidence_one_payment(o: dict[str, Any]) -> dict[str, Any]:
+    """Chỉ giữ payment đầu tiên — thử xem case nhiều payment có bị tính thừa không."""
+    kept, seen = [], False
+    for e in o["evidence_ids"]:
+        if e.startswith("payment:"):
+            if seen:
+                continue
+            seen = True
+        kept.append(e)
+    o["evidence_ids"] = kept
+    return o
+
+
 def v_causes_ranked(o: dict[str, Any]) -> dict[str, Any]:
     """Thêm nguyên nhân phụ ở nhánh có nguyên nhân thứ hai đúng về dữ kiện."""
     issue = o["assessment"]["primary_issue"]
@@ -120,7 +148,10 @@ VARIANTS: dict[str, tuple[Callable[[dict], dict], str]] = {
     "causes-ranked": (v_causes_ranked, "[RUI RO]    thêm nguyên nhân phụ cho late_delivery_seller (8 case)"),
     "confidence-full": (v_confidence_full, "[RUI RO]    confidence = 1.0 cho mọi case"),
     "evidence-minimal": (v_evidence_minimal, "[RUI RO]    evidence chỉ còn order + policy"),
-    "evidence-no-item": (v_evidence_no_item, "[RUI RO]    bỏ evidence item:"),
+    "evidence-no-item": (v_evidence_no_item, "[RUI RO]    bỏ evidence item: (giữ item_ids)"),
+    "evidence-no-seller": (v_evidence_no_seller, "[RUI RO]    bỏ evidence seller: (giữ seller_ids)"),
+    "evidence-no-payment": (v_evidence_no_payment, "[RUI RO]    bỏ evidence payment: (giữ payment_ids)"),
+    "evidence-one-payment": (v_evidence_one_payment, "[RUI RO]    chỉ giữ payment: đầu tiên"),
     "confidence-half": (v_confidence_half, "[CHI DE DO] confidence = 0.5 — dò xem confidence có được chấm không"),
     # Bộ đo trọng số: cố tình phá đúng một hạng mục, mức tụt = trọng số thật.
     "entities-order-only": (v_entities_order_only, "[DO TRONG SO] chỉ giữ order_ids"),

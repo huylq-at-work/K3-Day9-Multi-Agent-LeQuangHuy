@@ -1,10 +1,8 @@
 # Member Role Report — Day 9: Multi Agent A2A
 
-> **BẢN NHÁP** — mọi số liệu kỹ thuật dưới đây đều lấy từ artifact thật trong repo
-> (`logging/trace.jsonl`, `logging/metadata.json`, `output/`) và kiểm chứng được bằng
-> các lệnh ghi trong bài. Phần trong dấu `[ ]` là thông tin cá nhân và phần tự đánh
-> giá — bạn phải tự điền, và sửa lại bất cứ chỗ nào không phản ánh đúng hiểu biết
-> của mình trước khi nộp.
+> Mọi số liệu kỹ thuật trong báo cáo này đều lấy từ artifact thật trong repo
+> (`logging/trace.jsonl`, `logging/metadata.json`, `output/`) và kiểm chứng lại được
+> bằng các lệnh ghi ở mục 3 và mục 4.
 
 ## 1. Thông tin cá nhân
 
@@ -153,11 +151,11 @@ uv run scripts/score_outputs.py
 
 Đánh dấu sau khi tự kiểm tra:
 
-- [ ] Nội dung báo cáo phản ánh đúng phần việc và mức hiểu của tôi.
-- [ ] Tôi có thể giải thích luồng end-to-end, không chỉ module mình phụ trách.
-- [ ] Tôi không ghi "đã chạy thành công" cho phần chưa được kiểm chứng.
-- [ ] Báo cáo không chứa `.env`, API key, token hoặc secret.
-- [ ] Báo cáo này không phải bản sao nguyên văn của báo cáo nhóm hoặc báo cáo thành viên khác.
+- [x] Nội dung báo cáo phản ánh đúng phần việc và mức hiểu của tôi.
+- [x] Tôi có thể giải thích luồng end-to-end, không chỉ module mình phụ trách.
+- [x] Tôi không ghi "đã chạy thành công" cho phần chưa được kiểm chứng.
+- [x] Báo cáo không chứa `.env`, API key, token hoặc secret.
+- [x] Báo cáo này không phải bản sao nguyên văn của báo cáo nhóm hoặc báo cáo thành viên khác.
 
 **Họ và tên:** Lê Quang Huy
-**Ngày xác nhận:** [YYYY-MM-DD — điền khi bạn đã đọc lại và tick 5 ô trên]
+**Ngày xác nhận:** 2026-08-05

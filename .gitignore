@@ -1,0 +1,11 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+
+# Case mẫu tự sinh để kiểm thử, không phải input đề bài
+input_sample/
+output_sample/
+
+# Baseline tất định dùng để đối chiếu — KHÔNG được lẫn vào output/ khi nén nộp
+output_baseline/

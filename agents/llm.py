@@ -21,10 +21,52 @@ from .ratelimit import estimate_tokens, get_limiter
 load_dotenv()
 
 # === Khai báo model (yêu cầu mục 9.4 của đề) ===
-MODEL_NAME = "llama-3.1-8b-instant"
-MODEL_PARAM_SIZE_B = 8.0  # 8B <= 10B: thỏa ràng buộc
-MODEL_PROVIDER = "groq"
-BASE_URL = "https://api.groq.com/openai/v1"
+# Tên model để TRONG SOURCE CODE, không đặt trong .env. Mọi profile dưới đây đều
+# dùng model <= 10B tham số. .env chỉ chứa API key và tên profile đang chọn.
+PROVIDER_PROFILES: dict[str, dict[str, Any]] = {
+    "groq": {
+        "model": "llama-3.1-8b-instant",
+        "param_size_b": 8.0,
+        "base_url": "https://api.groq.com/openai/v1",
+        "api_key_env": "GROQ_API_KEY",
+    },
+    "cerebras": {
+        "model": "llama3.1-8b",
+        "param_size_b": 8.0,
+        "base_url": "https://api.cerebras.ai/v1",
+        "api_key_env": "CEREBRAS_API_KEY",
+    },
+    "openrouter": {
+        "model": "meta-llama/llama-3.1-8b-instruct",
+        "param_size_b": 8.0,
+        "base_url": "https://openrouter.ai/api/v1",
+        "api_key_env": "OPENROUTER_API_KEY",
+    },
+    "mistral": {
+        "model": "ministral-8b-latest",
+        "param_size_b": 8.0,
+        "base_url": "https://api.mistral.ai/v1",
+        "api_key_env": "MISTRAL_API_KEY",
+    },
+    "ollama": {
+        "model": "llama3.1:8b",
+        "param_size_b": 8.0,
+        "base_url": "http://localhost:11434/v1",
+        "api_key_env": None,  # chạy local, không cần key
+    },
+}
+
+MODEL_PROVIDER = os.environ.get("LLM_PROVIDER", "groq").strip().lower()
+if MODEL_PROVIDER not in PROVIDER_PROFILES:
+    raise RuntimeError(
+        f"LLM_PROVIDER={MODEL_PROVIDER!r} không hợp lệ. "
+        f"Chọn một trong: {', '.join(PROVIDER_PROFILES)}"
+    )
+
+_PROFILE = PROVIDER_PROFILES[MODEL_PROVIDER]
+MODEL_NAME = _PROFILE["model"]
+MODEL_PARAM_SIZE_B = _PROFILE["param_size_b"]  # mọi profile đều <= 10B
+BASE_URL = _PROFILE["base_url"]
 
 DEFAULT_TEMPERATURE = 0.0  # cần tái lập được kết quả giữa các lần chạy
 DEFAULT_MAX_TOKENS = 400  # các agent chỉ trả JSON ngắn; đặt rộng chỉ tốn hạn mức TPM
@@ -50,11 +92,16 @@ _client: OpenAI | None = None
 def get_client() -> OpenAI:
     global _client
     if _client is None:
-        api_key = os.environ.get("GROQ_API_KEY")
-        if not api_key:
-            raise LLMError(
-                "Thiếu GROQ_API_KEY. Tạo file .env ở root repo với dòng: GROQ_API_KEY=gsk_..."
-            )
+        key_env = _PROFILE["api_key_env"]
+        if key_env is None:
+            api_key = "not-needed"  # Ollama local không kiểm tra key
+        else:
+            api_key = os.environ.get(key_env, "")
+            if not api_key:
+                raise LLMError(
+                    f"Thiếu {key_env} cho provider {MODEL_PROVIDER!r}. "
+                    f"Thêm vào .env ở root repo: {key_env}=..."
+                )
         _client = OpenAI(api_key=api_key, base_url=BASE_URL)
     return _client
 

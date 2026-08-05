@@ -161,6 +161,23 @@ def responsible_parties_for(bundle: OrderBundle, issue: str) -> list[dict[str, s
     return []
 
 
+def affected_seller_ids(bundle: OrderBundle, issue: str) -> list[str]:
+    """Seller nào được coi là 'liên quan' tới kết luận.
+
+    Chỉ khai seller khi seller thực sự là bên chịu trách nhiệm. Ở các nhánh do
+    platform, đơn vị vận chuyển gây ra, hoặc không có bên nào chịu trách nhiệm,
+    danh sách này để rỗng.
+
+    Lần nộp đầu ta khai mọi seller của order ở mọi nhánh — hiểu 'affected' theo
+    nghĩa rộng là ai có mặt trong đơn. Kết quả chấm cho thấy cách hiểu đó bị trừ
+    điểm ở cả affected_entities lẫn evidence_ids, nên chuyển sang nghĩa hẹp:
+    liên quan = chịu trách nhiệm.
+    """
+    if issue == "late_delivery_seller":
+        return bundle.late_seller_ids[:MAX_ENTITY_IDS]
+    return []
+
+
 def refund_for(bundle: OrderBundle, issue: str) -> float:
     if issue in ("canceled_order_paid", "unavailable_order_paid"):
         return bundle.payment_total_brl
@@ -180,11 +197,8 @@ def evidence_ids_for(bundle: OrderBundle, issue: str) -> list[str]:
     for payment in bundle.payments[:3]:
         ids.append(f"payment:{order_id}:{payment.payment_sequential}")
 
-    # Chỉ nộp seller nào thực sự liên quan tới kết luận.
-    relevant_sellers = (
-        bundle.late_seller_ids if issue == "late_delivery_seller" else bundle.seller_ids
-    )
-    for seller_id in relevant_sellers[:2]:
+    # Chỉ nộp seller nào thực sự chịu trách nhiệm; nhánh khác không kèm seller.
+    for seller_id in affected_seller_ids(bundle, issue)[:2]:
         ids.append(f"seller:{seller_id}")
 
     ids.append(f"policy:{root_cause}")
@@ -212,7 +226,7 @@ def build_reference_output(case_id: str, bundle: OrderBundle, issue: str) -> dic
             "item_ids": [
                 f"{order_id}:{i.order_item_id}" for i in bundle.items[:MAX_ENTITY_IDS]
             ],
-            "seller_ids": bundle.seller_ids[:MAX_ENTITY_IDS],
+            "seller_ids": affected_seller_ids(bundle, issue),
             "payment_ids": [
                 f"{order_id}:{p.payment_sequential}"
                 for p in bundle.payments[:MAX_ENTITY_IDS]

@@ -12,7 +12,9 @@
     "item_ids": [
       "d67b79fea59821fda4d363d337a56c3a:1"
     ],
-    "seller_ids": [],
+    "seller_ids": [
+      "5a8e7d5003a1f221f9e1d6e411de7c23"
+    ],
     "payment_ids": [
       "d67b79fea59821fda4d363d337a56c3a:1"
     ]
@@ -35,6 +37,7 @@
     "order:d67b79fea59821fda4d363d337a56c3a",
     "item:d67b79fea59821fda4d363d337a56c3a:1",
     "payment:d67b79fea59821fda4d363d337a56c3a:1",
+    "seller:5a8e7d5003a1f221f9e1d6e411de7c23",
     "policy:ORDER_CANCELED_AFTER_PAYMENT"
   ],
   "financial_resolution": {

@@ -10,11 +10,11 @@
 
 | Thông tin       | Nội dung                                      |
 | --------------- | --------------------------------------------- |
-| Họ và tên       | [Họ và tên]                                   |
-| MSSV            | [MSSV]                                        |
+| Họ và tên       | Lê Quang Huy                                  |
+| MSSV            | [MSSV đầy đủ — bạn mới cho 5 số cuối: 01821]  |
 | Khóa/Lớp        | K3                                            |
 | Vai trò chính   | Làm cá nhân — sở hữu toàn bộ pipeline         |
-| Ngày hoàn thành | [YYYY-MM-DD]                                  |
+| Ngày hoàn thành | 2026-08-05                                    |
 
 ## 2. Vai trò và phạm vi công việc
 
@@ -159,5 +159,5 @@ uv run scripts/score_outputs.py
 - [ ] Báo cáo không chứa `.env`, API key, token hoặc secret.
 - [ ] Báo cáo này không phải bản sao nguyên văn của báo cáo nhóm hoặc báo cáo thành viên khác.
 
-**Họ và tên:** [Họ và tên]
-**Ngày xác nhận:** [YYYY-MM-DD]
+**Họ và tên:** Lê Quang Huy
+**Ngày xác nhận:** [YYYY-MM-DD — điền khi bạn đã đọc lại và tick 5 ô trên]

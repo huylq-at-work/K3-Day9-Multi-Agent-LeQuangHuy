@@ -84,6 +84,25 @@ def v_evidence_one_payment(o: dict[str, Any]) -> dict[str, Any]:
     return o
 
 
+def v_evidence_no_policy(o: dict[str, Any]) -> dict[str, Any]:
+    o["evidence_ids"] = [e for e in o["evidence_ids"] if not e.startswith("policy:")]
+    return o
+
+
+def v_evidence_one_each(o: dict[str, Any]) -> dict[str, Any]:
+    """Đúng một ID cho mỗi loại — giống hệt ví dụ trong README mục 6."""
+    seen: set[str] = set()
+    kept = []
+    for e in o["evidence_ids"]:
+        prefix = e.split(":", 1)[0]
+        if prefix in seen:
+            continue
+        seen.add(prefix)
+        kept.append(e)
+    o["evidence_ids"] = kept
+    return o
+
+
 def v_evidence_grounding(o: dict[str, Any]) -> dict[str, Any]:
     """Chỉ giữ order: + payment: + policy:.
 
@@ -189,6 +208,8 @@ VARIANTS: dict[str, tuple[Callable[[dict], dict], str]] = {
     "evidence-no-item": (v_evidence_no_item, "[RUI RO]    bỏ evidence item: (giữ item_ids)"),
     "evidence-no-seller": (v_evidence_no_seller, "[RUI RO]    bỏ evidence seller: (giữ seller_ids)"),
     "evidence-grounding": (v_evidence_grounding, "[RUI RO]    chỉ order: + payment: + policy: theo mô tả grounding của Bản đồ Lab"),
+    "evidence-no-policy": (v_evidence_no_policy, "[RUI RO]    bỏ evidence policy:"),
+    "evidence-one-each": (v_evidence_one_each, "[RUI RO]    đúng một ID mỗi loại, như ví dụ README mục 6"),
     "evidence-no-payment": (v_evidence_no_payment, "[RUI RO]    bỏ evidence payment: (giữ payment_ids)"),
     "evidence-one-payment": (v_evidence_one_payment, "[RUI RO]    chỉ giữ payment: đầu tiên"),
     "confidence-half": (v_confidence_half, "[CHI DE DO] confidence = 0.5 — dò xem confidence có được chấm không"),

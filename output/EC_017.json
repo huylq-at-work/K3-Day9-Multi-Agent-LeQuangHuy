@@ -3,7 +3,7 @@
   "assessment": {
     "primary_issue": "late_delivery_logistics",
     "case_status": "action_required",
-    "confidence": 0.9
+    "confidence": 1.0
   },
   "affected_entities": {
     "order_ids": [

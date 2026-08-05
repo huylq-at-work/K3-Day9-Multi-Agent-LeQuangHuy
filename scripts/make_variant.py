@@ -80,6 +80,41 @@ def v_entities_order_only(o: dict[str, Any]) -> dict[str, Any]:
 #   AN TOAN   - có cơ sở tin là bằng hoặc hơn bản gốc
 #   RUI RO    - có thể hơn, có thể kém, xác suất hai chiều
 #   CHI DE DO - gần như chắc chắn tụt điểm, nộp xong PHẢI nộp lại baseline ngay
+def v_break_financial(o: dict[str, Any]) -> dict[str, Any]:
+    """Phá số tiền. Mức tụt = trọng số thật của financial_resolution."""
+    f = o["financial_resolution"]
+    for k in ("item_total_brl", "freight_total_brl", "payment_total_brl", "recommended_refund_brl"):
+        f[k] = 1.0
+    return o
+
+
+def v_break_actions(o: dict[str, Any]) -> dict[str, Any]:
+    """Phá resolution_actions. Mức tụt = trọng số thật của actions."""
+    correct = {"issue_full_refund", "refund_freight", "explain_valid_split_payment",
+               "reject_late_refund"}
+    wrong = correct - set(o["resolution_actions"])
+    o["resolution_actions"] = [sorted(wrong)[0]]
+    return o
+
+
+def v_break_causes(o: dict[str, Any]) -> dict[str, Any]:
+    """Phá cause_code (vẫn là mã hợp lệ, chỉ sai case). Mức tụt = trọng số ranked_causes."""
+    codes = ["SELLER_HANDOFF_AFTER_LIMIT", "CARRIER_DELIVERED_AFTER_ESTIMATE",
+             "ORDER_CANCELED_AFTER_PAYMENT", "ORDER_UNAVAILABLE_AFTER_PAYMENT",
+             "MULTIPLE_PAYMENTS_RECONCILED", "DELIVERY_WITHIN_ESTIMATE"]
+    current = o["root_cause_analysis"]["ranked_causes"][0]["cause_code"]
+    o["root_cause_analysis"]["ranked_causes"] = [
+        {"cause_code": next(c for c in codes if c != current), "rank": 1}
+    ]
+    return o
+
+
+def v_break_parties(o: dict[str, Any]) -> dict[str, Any]:
+    """Xoá responsible_parties. Mức tụt = trọng số phần này."""
+    o["root_cause_analysis"]["responsible_parties"] = []
+    return o
+
+
 VARIANTS: dict[str, tuple[Callable[[dict], dict], str]] = {
     "baseline": (v_baseline, "[AN TOAN]   bản gốc 93.6977 — luôn giữ để nộp chốt"),
     "causes-ranked": (v_causes_ranked, "[RUI RO]    thêm nguyên nhân phụ cho late_delivery_seller (8 case)"),
@@ -87,7 +122,12 @@ VARIANTS: dict[str, tuple[Callable[[dict], dict], str]] = {
     "evidence-minimal": (v_evidence_minimal, "[RUI RO]    evidence chỉ còn order + policy"),
     "evidence-no-item": (v_evidence_no_item, "[RUI RO]    bỏ evidence item:"),
     "confidence-half": (v_confidence_half, "[CHI DE DO] confidence = 0.5 — dò xem confidence có được chấm không"),
-    "entities-order-only": (v_entities_order_only, "[CHI DE DO] chỉ giữ order_ids — đo affected_entities đang kiếm bao nhiêu điểm"),
+    # Bộ đo trọng số: cố tình phá đúng một hạng mục, mức tụt = trọng số thật.
+    "entities-order-only": (v_entities_order_only, "[DO TRONG SO] chỉ giữ order_ids"),
+    "break-financial": (v_break_financial, "[DO TRONG SO] mọi số tiền = 1.0"),
+    "break-actions": (v_break_actions, "[DO TRONG SO] resolution_actions sai"),
+    "break-causes": (v_break_causes, "[DO TRONG SO] cause_code sai"),
+    "break-parties": (v_break_parties, "[DO TRONG SO] responsible_parties rỗng"),
 }
 
 

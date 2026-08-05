@@ -84,6 +84,18 @@ def v_evidence_one_payment(o: dict[str, Any]) -> dict[str, Any]:
     return o
 
 
+def v_evidence_grounding(o: dict[str, Any]) -> dict[str, Any]:
+    """Chỉ giữ order: + payment: + policy:.
+
+    Bản đồ Lab mô tả grounding là "refund phải dẫn về payment_id, order_id hoặc
+    quy định có thật" — nêu đúng ba loại này, không nhắc item lẫn seller.
+    """
+    o["evidence_ids"] = [
+        e for e in o["evidence_ids"] if e.startswith(("order:", "payment:", "policy:"))
+    ]
+    return o
+
+
 def v_causes_ranked(o: dict[str, Any]) -> dict[str, Any]:
     """Thêm nguyên nhân phụ ở nhánh có nguyên nhân thứ hai đúng về dữ kiện."""
     issue = o["assessment"]["primary_issue"]
@@ -150,6 +162,7 @@ VARIANTS: dict[str, tuple[Callable[[dict], dict], str]] = {
     "evidence-minimal": (v_evidence_minimal, "[RUI RO]    evidence chỉ còn order + policy"),
     "evidence-no-item": (v_evidence_no_item, "[RUI RO]    bỏ evidence item: (giữ item_ids)"),
     "evidence-no-seller": (v_evidence_no_seller, "[RUI RO]    bỏ evidence seller: (giữ seller_ids)"),
+    "evidence-grounding": (v_evidence_grounding, "[RUI RO]    chỉ order: + payment: + policy: theo mô tả grounding của Bản đồ Lab"),
     "evidence-no-payment": (v_evidence_no_payment, "[RUI RO]    bỏ evidence payment: (giữ payment_ids)"),
     "evidence-one-payment": (v_evidence_one_payment, "[RUI RO]    chỉ giữ payment: đầu tiên"),
     "confidence-half": (v_confidence_half, "[CHI DE DO] confidence = 0.5 — dò xem confidence có được chấm không"),

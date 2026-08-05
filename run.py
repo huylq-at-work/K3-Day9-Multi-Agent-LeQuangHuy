@@ -68,7 +68,8 @@ def run_deterministic(case: dict[str, Any]) -> dict[str, Any]:
         return coordinator_abort(state)["final_output"]
     issue = first_matching_issue(bundle) or "unsupported_late_claim"
     output = build_reference_output(case["case_id"], bundle, issue)
-    output["assessment"]["confidence"] = 0.9
+    # Cùng quy ước với đường chạy đầy đủ: kết luận đã được luật tất định xác nhận.
+    output["assessment"]["confidence"] = 1.0
     return output
 
 

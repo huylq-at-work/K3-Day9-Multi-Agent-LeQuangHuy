@@ -95,6 +95,16 @@ Verifier là **chốt chặn tất định**, không gọi LLM. Nó kiểm ba l�
 Nếu không đạt, case được **trả ngược về Policy Agent kèm danh sách lý do bị bác**,
 tối đa 2 vòng. Hết vòng mà vẫn lệch thì `coordinator_finalize` ghi kết quả áp luật
 tất định và hạ `confidence` xuống `0.55` — vì lúc đó kết luận do luật quyết định
+
+Quy ước `confidence` trong output cuối, đặt ở `coordinator_finalize`:
+
+| Tình huống | Giá trị | Vì sao |
+| --- | ---: | --- |
+| Verifier thông qua | `1.0` | kết luận đã được đối chiếu với luật tất định và mọi ID đã kiểm tra tồn tại trong CSV — không còn là phỏng đoán của model 8B |
+| Hết vòng sửa, dùng fallback | `0.55` | kết luận do luật quyết định chứ không phải model đồng thuận |
+| Order không tồn tại trong CSV | `0.3` | không có dữ liệu để kiểm chứng bất cứ điều gì |
+
+Trong lượt chạy thật cả 50 case đều rơi vào nhóm đầu.
 chứ không phải do model đồng thuận.
 
 **Đây là đánh đổi có chủ ý:** nộp file sai schema bị hard gate 0 điểm, nên hệ thống
@@ -148,7 +158,13 @@ uv run run.py
 | `uv run run.py --dry-run` | Chỉ áp luật tất định, không gọi LLM — dùng làm baseline đối chiếu |
 | `uv run run.py --cases EC_005` | Chạy một case để soi trace |
 | `uv run scripts/smoke_graph.py` | Kiểm tra wiring của graph bằng LLM stub, không tốn quota |
+| `uv run scripts/score_outputs.py` | Tự chấm theo trọng số mục 8, kiểm tra hard gate ngược về CSV |
 | `uv run scripts/compare_runs.py` | Đối chiếu kết quả agent với baseline, kiểm tra điều kiện nộp |
+| `uv run scripts/make_zip.py` | Đóng gói `output/` thành file nộp đúng cấu trúc |
+| `uv run scripts/make_sample_inputs.py` | Sinh case mẫu vào `input_sample/` cho `smoke_graph.py` |
+| `uv run scripts/rebuild_outputs.py` | Dựng lại output từ quyết định đã có trong trace, không gọi LLM |
+| `uv run scripts/rebuild_metadata.py` | Dựng lại `metadata.json` từ trace |
+| `uv run scripts/probe_limits.py` | Đo hạn mức thật của provider đang cấu hình |
 
 Baseline dùng để đối chiếu:
 

@@ -605,6 +605,10 @@ def coordinator_finalize(state: CaseState) -> dict[str, Any]:
 
     if report["passed"] and report["candidate"] is not None:
         output = report["candidate"]
+        # Verifier đã đối chiếu kết luận với luật tất định và thông qua, đồng thời
+        # xác nhận mọi ID tồn tại thật trong CSV. Đến bước này độ chắc chắn không
+        # còn là phỏng đoán của model 8B nữa, nên ghi 1.0 thay vì giữ số model đưa.
+        output["assessment"]["confidence"] = 1.0
     else:
         fallback_used = True
         reference_issue = report["reference_issue"] or "unsupported_late_claim"

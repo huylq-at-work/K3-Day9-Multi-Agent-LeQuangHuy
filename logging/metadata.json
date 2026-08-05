@@ -1,5 +1,6 @@
 {
-  "run_started_utc": "2026-08-05T04:42:04.043921+00:00",
+  "run_started_utc": "2026-08-05T03:11:54.855175+00:00",
+  "run_finished_utc": "2026-08-05T03:39:02.988340+00:00",
   "framework": "langgraph",
   "runtime": {
     "language": "python",
@@ -25,6 +26,30 @@
   },
   "cases_total": 50,
   "cases_failed": 0,
-  "elapsed_seconds": 0.02,
-  "dry_run": true
+  "llm_calls": 207,
+  "tokens": {
+    "prompt": 118312,
+    "completion": 15332,
+    "total": 133644
+  },
+  "model_processing_seconds": 92.5,
+  "verification": {
+    "passed_first_try": 43,
+    "rejected_by_verifier": 7,
+    "rejected_cases": [
+      "EC_003",
+      "EC_007",
+      "EC_015",
+      "EC_021",
+      "EC_026",
+      "EC_041",
+      "EC_045"
+    ],
+    "deterministic_fallback_cases": []
+  },
+  "llm_disagreed_with_data": {
+    "delivery_agent": 26,
+    "order_seller_agent": 6
+  },
+  "trace_events": 364
 }

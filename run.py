@@ -133,6 +133,12 @@ def main() -> int:
 
     elapsed = time.perf_counter() - started
 
+    if args.dry_run:
+        # Không ghi metadata: file này phải mô tả lượt chạy thật qua đủ 6 agent.
+        # Trước đây dry-run ghi đè làm metadata báo elapsed 0.02s và dry_run=true.
+        print(f"\n[dry-run] Xong {len(cases)} case trong {elapsed:.1f}s — giữ nguyên metadata.json")
+        return 0
+
     write_metadata(
         {
             "run_started_utc": datetime.now(timezone.utc).isoformat(),

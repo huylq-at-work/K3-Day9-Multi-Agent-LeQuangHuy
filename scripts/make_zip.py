@@ -59,7 +59,7 @@ def main() -> int:
         names = archive.namelist()
         expected = [f"output/EC_{i:03d}.json" for i in range(1, N_CASES + 1)]
         assert names == expected, f"cấu trúc sai: {names[:3]}"
-        assert all("\\" in n is False for n in names), "có backslash trong đường dẫn"
+        assert all("\\" not in n for n in names), "có backslash trong đường dẫn"
         assert archive.testzip() is None, "zip hỏng"
 
     size_kb = args.zip.stat().st_size / 1024

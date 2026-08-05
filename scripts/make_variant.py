@@ -104,11 +104,27 @@ def main() -> int:
         print("\nDùng: uv run scripts/make_variant.py <tên>")
         return 0
 
-    if args.variant not in VARIANTS:
-        raise SystemExit(f"Không có biến thể {args.variant!r}. Chạy --list để xem.")
+    # Dạng tham số hoá: conf:0.95 -> đặt confidence = 0.95 cho mọi case.
+    if args.variant.startswith("conf:"):
+        try:
+            value = round(float(args.variant.split(":", 1)[1]), 2)
+        except ValueError:
+            raise SystemExit(f"Giá trị confidence không hợp lệ: {args.variant!r}") from None
+        if not 0.0 <= value <= 1.0:
+            raise SystemExit(f"confidence phải nằm trong [0,1], nhận {value}")
 
-    transform, desc = VARIANTS[args.variant]
-    out_dir = ROOT / f"output_variant_{args.variant}"
+        def transform(o: dict[str, Any], _v: float = value) -> dict[str, Any]:
+            o["assessment"]["confidence"] = _v
+            return o
+
+        desc = f"confidence = {value} cho mọi case"
+    elif args.variant not in VARIANTS:
+        raise SystemExit(f"Không có biến thể {args.variant!r}. Chạy --list để xem.")
+    else:
+        transform, desc = VARIANTS[args.variant]
+    # Windows cấm ':' trong tên file, mà biến thể tham số hoá lại dùng dạng conf:0.95.
+    slug = args.variant.replace(":", "-")
+    out_dir = ROOT / f"output_variant_{slug}"
     if out_dir.exists():
         shutil.rmtree(out_dir)
     out_dir.mkdir(parents=True)
@@ -124,7 +140,7 @@ def main() -> int:
             json.dumps(modified, ensure_ascii=False, indent=2), encoding="utf-8"
         )
 
-    zip_path = ROOT / f"output_{args.variant}.zip"
+    zip_path = ROOT / f"output_{slug}.zip"
     if zip_path.exists():
         zip_path.unlink()
     with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as archive:

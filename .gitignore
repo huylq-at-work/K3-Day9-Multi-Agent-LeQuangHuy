@@ -10,5 +10,6 @@ output_sample/
 # Baseline tất định dùng để đối chiếu — KHÔNG được lẫn vào output/ khi nén nộp
 output_baseline/
 
-# File nén nộp bài — dựng lại được từ output/, không cần đưa vào repo
-output.zip
+# File nén nộp bài và các biến thể dò — dựng lại được, không cần đưa vào repo
+*.zip
+output_variant_*/
